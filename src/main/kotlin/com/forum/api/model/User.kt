@@ -11,7 +11,8 @@ data class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     val name: String,
-    val email: String
+    val email: String,
+    val password: String
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
