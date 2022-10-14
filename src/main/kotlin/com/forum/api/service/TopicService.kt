@@ -2,6 +2,7 @@ package com.forum.api.service
 
 import com.forum.api.controller.request.SaveTopicRequest
 import com.forum.api.controller.request.UpdateTopicRequest
+import com.forum.api.controller.response.TopicReportResponse
 import com.forum.api.controller.response.TopicResponse
 import com.forum.api.exception.NotFoundException
 import com.forum.api.mapper.TopicMapper
@@ -54,5 +55,9 @@ class TopicService(
 
     fun remove(id: Long) {
         topicRepository.deleteById(id)
+    }
+
+    fun report(): List<TopicReportResponse> {
+        return topicRepository.report()
     }
 }

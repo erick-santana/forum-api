@@ -2,8 +2,11 @@ package com.forum.api.controller
 
 import com.forum.api.controller.request.SaveTopicRequest
 import com.forum.api.controller.request.UpdateTopicRequest
+import com.forum.api.controller.response.TopicReportResponse
 import com.forum.api.controller.response.TopicResponse
 import com.forum.api.service.TopicService
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -16,9 +19,10 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("topic")
-class TopicController(private val service: TopicService) {
+open class TopicController(private val service: TopicService) {
 
     @GetMapping("/all")
+    @Cacheable("topics")
     fun findAll(
         @RequestParam(required = false) courseName: String?,
         @PageableDefault(size = 5) pageable: Pageable
@@ -33,6 +37,7 @@ class TopicController(private val service: TopicService) {
 
     @PostMapping
     @Transactional
+    @CacheEvict(value = ["topics"], allEntries = true)
     fun save(
         @RequestBody @Valid topicRequest: SaveTopicRequest,
         uriBuilder: UriComponentsBuilder
@@ -44,14 +49,21 @@ class TopicController(private val service: TopicService) {
 
     @PutMapping
     @Transactional
-    fun update(@RequestBody @Valid topic: UpdateTopicRequest) {
-        service.update(topic)
+    @CacheEvict(value = ["topics"], allEntries = true)
+    fun update(@RequestBody @Valid topic: UpdateTopicRequest): TopicResponse {
+        return service.update(topic)
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
+    @CacheEvict(value = ["topics"], allEntries = true)
     fun remove(@PathVariable id: Long) {
         return service.remove(id)
+    }
+
+    @GetMapping("/report")
+    fun report(): List<TopicReportResponse> {
+        return service.report()
     }
 }
