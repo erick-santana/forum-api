@@ -6,6 +6,8 @@ import com.forum.api.controller.response.TopicResponse
 import com.forum.api.exception.NotFoundException
 import com.forum.api.mapper.TopicMapper
 import com.forum.api.repository.TopicRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.util.stream.Collectors
 
@@ -17,10 +19,14 @@ class TopicService(
     private val courseService: CourseService
     ) {
 
-    fun findAll(): MutableList<TopicResponse> {
-        return topicRepository.findAll().stream().map {
-                topic -> topicMapper.toTopicResponse(topic)
-        }.collect(Collectors.toList())
+    fun findAll(courseName: String?, pageable: Pageable): Page<TopicResponse> {
+        val topics = if (courseName.isNullOrEmpty()) {
+            topicRepository.findAll(pageable)
+        } else {
+            topicRepository.findByCourseName(courseName, pageable)
+        }
+
+        return topics.map { topic -> topicMapper.toTopicResponse(topic) }
     }
 
     fun findById(id: Long): TopicResponse {

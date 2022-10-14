@@ -3,8 +3,10 @@ package com.forum.api.controller
 import com.forum.api.controller.request.SaveTopicRequest
 import com.forum.api.controller.request.UpdateTopicRequest
 import com.forum.api.controller.response.TopicResponse
-import com.forum.api.model.Topic
 import com.forum.api.service.TopicService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -17,8 +19,11 @@ import javax.validation.Valid
 class TopicController(private val service: TopicService) {
 
     @GetMapping("/all")
-    fun findAll(): List<TopicResponse> {
-        return service.findAll()
+    fun findAll(
+        @RequestParam(required = false) courseName: String?,
+        @PageableDefault(size = 5) pageable: Pageable
+    ): Page<TopicResponse> {
+        return service.findAll(courseName, pageable)
     }
 
     @GetMapping("/{id}")
