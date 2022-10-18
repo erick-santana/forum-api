@@ -1,10 +1,8 @@
 package com.forum.api.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.Hibernate
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity(name = "usuario")
 data class User(
@@ -12,7 +10,11 @@ data class User(
     val id: Long? = null,
     val name: String,
     val email: String,
-    val password: String
+    val password: String,
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_role")
+    val roles: List<Role> = mutableListOf()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
